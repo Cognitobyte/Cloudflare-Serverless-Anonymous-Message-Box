@@ -1,2 +1,8 @@
-/admin /admin.html 200
-/* /index.html 200
+# Route /admin → admin.html
+/admin    /admin.html   200
+
+# Let API requests go to your Worker (don’t rewrite them!)
+/api/*    /api/:splat   200
+
+# All other paths → index.html (SPA fallback)
+ /*       /index.html   200
