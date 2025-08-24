@@ -408,7 +408,7 @@
                 
                 if (response.ok) {
                     localStorage.setItem('adminToken', result.token);
-                    window.location.href = '/admin.html';
+                    window.location.href = '/admin';
                 } else {
                     showMessage(result.error || 'Invalid password', 'error');
                 }
