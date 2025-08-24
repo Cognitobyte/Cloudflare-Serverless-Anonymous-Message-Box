@@ -1,475 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anonymous Message Box</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-            max-width: 600px;
-            width: 100%;
-            transform: translateY(0);
-            transition: all 0.3s ease;
-        }
-
-        .container:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
-        }
-
-        h1 {
-            text-align: center;
-            color: #2d3748;
-            margin-bottom: 10px;
-            font-size: 2.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: #718096;
-            margin-bottom: 30px;
-            font-size: 1.1rem;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #4a5568;
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-
-        input, textarea {
-            width: 100%;
-            padding: 15px 20px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            background: #f8fafc;
-            color: #2d3748;
-        }
-
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-            transform: translateY(-1px);
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 120px;
-            font-family: inherit;
-        }
-
-        .file-upload {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        .file-label {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 15px 20px;
-            border: 2px dashed #cbd5e0;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: #f8fafc;
-            color: #4a5568;
-        }
-
-        .file-label:hover {
-            border-color: #667eea;
-            background: white;
-        }
-
-        .file-icon {
-            margin-right: 10px;
-            font-size: 1.2rem;
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-        }
-
-        .submit-btn:active {
-            transform: translateY(0);
-        }
-
-        .submit-btn.loading {
-            color: transparent;
-        }
-
-        .spinner {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-            display: none;
-        }
-
-        .submit-btn.loading .spinner {
-            display: block;
-        }
-
-        @keyframes spin {
-            to { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-
-        .admin-link {
-            text-align: center;
-            margin-top: 30px;
-        }
-
-        .admin-link a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .admin-link a:hover {
-            color: #764ba2;
-        }
-
-        .message {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-weight: 500;
-            opacity: 0;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
-        }
-
-        .message.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .message.success {
-            background: #f0fff4;
-            color: #38a169;
-            border: 1px solid #9ae6b4;
-        }
-
-        .message.error {
-            background: #fed7d7;
-            color: #e53e3e;
-            border: 1px solid #feb2b2;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
-        }
-
-        .modal-content {
-            background: white;
-            margin: 10% auto;
-            padding: 30px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
-        }
-
-        .modal.show .modal-content {
-            transform: scale(1);
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .close:hover {
-            color: #667eea;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 30px 20px;
-                margin: 10px;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anonymous Messages</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <div class="container">
-        <h1>📮 Anonymous Messages</h1>
-        <p class="subtitle">Share your thoughts anonymously and securely</p>
-        
-        <div id="message-area"></div>
-        
-        <form id="messageForm">
-            <div class="form-group">
-                <label for="subject">Subject (Optional)</label>
-                <input type="text" id="subject" name="subject" placeholder="What's on your mind?">
-            </div>
-            
-            <div class="form-group">
-                <label for="message">Your Message</label>
-                <textarea id="message" name="message" required placeholder="Write your anonymous message here..."></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label>Attach Image (Optional)</label>
-                <div class="file-upload">
-                    <input type="file" id="imageFile" class="file-input" accept="image/*">
-                    <label for="imageFile" class="file-label">
-                        <span class="file-icon">📷</span>
-                        <span id="file-text">Choose image file</span>
-                    </label>
-                </div>
-            </div>
-            
-            <button type="submit" class="submit-btn">
-                Send Anonymous Message
-                <div class="spinner"></div>
-            </button>
-        </form>
-        
-        <div class="admin-link">
-            <a href="#" onclick="showAdminLogin()">Admin Panel</a>
-        </div>
-    </div>
+  <header>
+    <h1>Send an Anonymous Message 💌</h1>
+  </header>
 
-    <!-- Admin Login Modal -->
-    <div id="adminModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="hideAdminLogin()">&times;</span>
-            <h2 style="margin-bottom: 20px; color: #2d3748;">Admin Login</h2>
-            <form id="adminForm">
-                <div class="form-group">
-                    <label for="adminPassword">Password</label>
-                    <input type="password" id="adminPassword" required placeholder="Enter admin password">
-                </div>
-                <button type="submit" class="submit-btn">
-                    Access Admin Panel
-                    <div class="spinner"></div>
-                </button>
-            </form>
-        </div>
-    </div>
+  <main>
+    <form id="messageForm">
+      <label for="message">Your Message</label>
+      <textarea id="message" name="message" maxlength="1000" required></textarea>
 
-    <script>
-        // Configuration - Replace with your Cloudflare Worker URL
-        const API_BASE_URL = 'https://anonymous-messages-api.artizenlive2025.workers.dev';
-        
-        // File upload handling
-        document.getElementById('imageFile').addEventListener('change', function(e) {
-            const fileText = document.getElementById('file-text');
-            if (e.target.files.length > 0) {
-                fileText.textContent = e.target.files[0].name;
-            } else {
-                fileText.textContent = 'Choose image file';
-            }
+      <label for="image">Optional Image</label>
+      <input type="file" id="image" name="image" accept="image/*" />
+
+      <button type="submit">Send Message</button>
+    </form>
+
+    <div id="response" class="hidden"></div>
+  </main>
+
+  <footer>
+    <p>Built with Cloudflare Workers + D1 + R2</p>
+  </footer>
+
+  <script>
+    const form = document.getElementById("messageForm");
+    const responseDiv = document.getElementById("response");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      responseDiv.textContent = "Sending...";
+      responseDiv.classList.remove("hidden");
+
+      const formData = new FormData(form);
+
+      try {
+        const res = await fetch("/api/messages", {
+          method: "POST",
+          body: formData
         });
 
-        // Message form submission
-        document.getElementById('messageForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const submitBtn = e.target.querySelector('.submit-btn');
-            const messageArea = document.getElementById('message-area');
-            
-            // Show loading state
-            submitBtn.classList.add('loading');
-            
-            try {
-                const formData = new FormData();
-                formData.append('subject', document.getElementById('subject').value);
-                formData.append('message', document.getElementById('message').value);
-                
-                const imageFile = document.getElementById('imageFile').files[0];
-                if (imageFile) {
-                    formData.append('image', imageFile);
-                }
-                
-                const response = await fetch(`${API_BASE_URL}/api/messages`, {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                
-                if (response.ok) {
-                    showMessage('Message sent successfully! Thank you for sharing.', 'success');
-                    document.getElementById('messageForm').reset();
-                    document.getElementById('file-text').textContent = 'Choose image file';
-                } else {
-                    showMessage(result.error || 'Failed to send message', 'error');
-                }
-            } catch (error) {
-                showMessage('Network error. Please try again.', 'error');
-            } finally {
-                submitBtn.classList.remove('loading');
-            }
-        });
+        const data = await res.json();
 
-        // Admin form submission
-        document.getElementById('adminForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const submitBtn = e.target.querySelector('.submit-btn');
-            const password = document.getElementById('adminPassword').value;
-            
-            submitBtn.classList.add('loading');
-            
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/admin/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ password })
-                });
-                
-                const result = await response.json();
-                
-                if (response.ok) {
-                    localStorage.setItem('adminToken', result.token);
-                    window.location.href = '/admin';
-                } else {
-                    showMessage(result.error || 'Invalid password', 'error');
-                }
-            } catch (error) {
-                showMessage('Network error. Please try again.', 'error');
-            } finally {
-                submitBtn.classList.remove('loading');
-            }
-        });
-
-        function showMessage(text, type) {
-            const messageArea = document.getElementById('message-area');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${type}`;
-            messageDiv.textContent = text;
-            
-            messageArea.innerHTML = '';
-            messageArea.appendChild(messageDiv);
-            
-            // Trigger animation
-            setTimeout(() => messageDiv.classList.add('show'), 10);
-            
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                messageDiv.classList.remove('show');
-                setTimeout(() => messageDiv.remove(), 300);
-            }, 5000);
+        if (res.ok) {
+          responseDiv.textContent = "✅ Message sent!";
+          form.reset();
+        } else {
+          responseDiv.textContent = "❌ " + (data.error || "Failed to send");
         }
-
-        function showAdminLogin() {
-            const modal = document.getElementById('adminModal');
-            modal.style.display = 'block';
-            setTimeout(() => modal.classList.add('show'), 10);
-        }
-
-        function hideAdminLogin() {
-            const modal = document.getElementById('adminModal');
-            modal.classList.remove('show');
-            setTimeout(() => modal.style.display = 'none', 300);
-        }
-
-        // Close modal when clicking outside
-        window.addEventListener('click', function(e) {
-            const modal = document.getElementById('adminModal');
-            if (e.target === modal) {
-                hideAdminLogin();
-            }
-        });
-
-        // Add some interactive animations
-        document.addEventListener('DOMContentLoaded', function() {
-            const container = document.querySelector('.container');
-            container.style.opacity = '0';
-            container.style.transform = 'translateY(30px)';
-            
-            setTimeout(() => {
-                container.style.transition = 'all 0.6s ease';
-                container.style.opacity = '1';
-                container.style.transform = 'translateY(0)';
-            }, 100);
-        });
-    </script>
+      } catch (err) {
+        responseDiv.textContent = "❌ Network error";
+      }
+    });
+  </script>
 </body>
 </html>
